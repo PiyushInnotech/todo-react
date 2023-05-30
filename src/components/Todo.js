@@ -1,79 +1,68 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const getLocalList =()=>{
+const getLocalList = () => {
     let list = localStorage.getItem('todolist')
-    if(list){
+    if (list) {
         return JSON.parse(list)
-    }else{
+    } else {
         return [];
     }
 }
 
 const Todo = () => {
+    const [todoList, setTodoList] = useState(getLocalList());
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const navigate = useNavigate();
 
-    const [newTodo , setNewTodo] = useState({
-        title : '',
-        desc: '',
-    });
-
-    const [todoList , setTodoList] = useState(getLocalList());
-
-    const handleAddTodoItem = (e) => {
-        const { name, value } = e.target;
-        setNewTodo({ ...newTodo, [name]: value})
-    }
-    
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (todoList) {
-            setTodoList([...todoList, newTodo])
-        } else {
-            localStorage.setItem('todolist', JSON.stringify([newTodo]))
-        }
-
-        setNewTodo({ ...newTodo, title: '', desc: ''})
-    }
-
-    const deleteTodo =(index)=>{
-        let updatedList = todoList.filter((item,ind)=>{
+    const deleteTodo = (e, index) => {
+        e.stopPropagation();
+        let updatedList = todoList.filter((item, ind) => {
             return ind !== index;
         })
 
         setTodoList(updatedList)
     }
 
-    useEffect(()=>{
-        localStorage.setItem("todolist",JSON.stringify(todoList))
-    },[todoList])
+    const editTodo = (e, id) => {
+        e.stopPropagation();
+        navigate(`/edittodo/${id}`)
+    }
+
+    const AddNewTodo = () => {
+        navigate('/addtodo')
+    }
+
+    const showDescription = (index) => {
+        setActiveIndex(index === activeIndex ? -1 : index);
+    }
+
+    useEffect(() => {
+        localStorage.setItem("todolist", JSON.stringify(todoList))
+    }, [todoList])
 
     return (
-        <div>
-            <input 
-                type='text' 
-                value={newTodo.title} 
-                name="title" 
-                onChange={handleAddTodoItem} 
-                placeholder='Enter Todo' />
-            <input 
-                type='text' 
-                value={newTodo.desc} 
-                name="desc" 
-                onChange={handleAddTodoItem} 
-                placeholder='Enter Description' />
-            <button onClick={handleSubmit}>
-                Add
-            </button>
-            {
-                todoList && todoList.length ? todoList.map((value,index) => {                  
-                    return (
-                        <div>
-                            <p>Title:  {value.title} <button onClick={() => deleteTodo(index)}>X</button> </p>
-                            <p className="">Description : {value.desc} </p>
-                            
-                        </div>
-                    );
-                }) : ( <h4>No Todos, Add a todo</h4>)
-            }
+        <div className='todoList'>
+            <h1 className="pageHeading">To Do List</h1>
+            <div className='listWrapper'>
+                {
+                    todoList && todoList.length ? todoList.map((todo, index) => {
+                        return (
+                            <div className="listItem" key={todo.id}>
+                                <div className='title' onClick={() => showDescription(index)}>
+                                    <p>{todo.title}</p>
+                                    <div>
+                                        <button onClick={(e) => deleteTodo(e, index)}>X</button>
+                                        <button onClick={(e) => editTodo(e ,todo.id)}>Edit</button>
+                                    </div>
+                                </div>
+                                {index === activeIndex && <p className="desc"> Description: {todo.desc} </p>}
+                            </div>
+                        );
+                    }) : (<h4 className='pageSubHeading'>No Todos, Add a todo</h4>)
+                }
+            </div>
+            <button className='addButton' onClick={() => AddNewTodo()}>Add</button>
         </div>
     )
 }
