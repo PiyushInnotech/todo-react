@@ -59,10 +59,15 @@ const Todo = () => {
                                 {index === activeIndex && <p className="desc"> Description: {todo.desc} </p>}
                             </div>
                         );
-                    }) : (<h4 className='pageSubHeading'>No Todos, Add a todo</h4>)
+                    }) : (
+                        <div className="noTodo">
+                            <h4 className='pageSubHeading'>No Todos, Add a todo</h4>
+                            <button className='' onClick={() => AddNewTodo()}>Add</button>
+                        </div>
+                    )
                 }
             </div>
-            <button className='addButton' onClick={() => AddNewTodo()}>Add</button>
+            { todoList && todoList.length && <button className='addButton' onClick={() => AddNewTodo()}>Add</button> }
         </div>
     )
 }

@@ -14,25 +14,33 @@ const AddTodo = () => {
     const [newTodo, setNewTodo] = useState({
         title: '',
         desc: '',
-        id: '',
+        id: null,
         showDesc: false
     });
     const navigate = useNavigate();
     const {todoId} = useParams();
     const [error, setError] = useState('');
     const [todoList, setTodoList] = useState(getLocalList());
-    const newTodoId = todoList && todoList.length ? todoList[todoList.length-1].id + 1 : '1'
-
+    const newTodoId = todoList && todoList.length ? todoList[todoList.length-1].id + 1 : 1
+  
     useEffect(() => {
-        setNewTodo((prevTodo) => ({ ...prevTodo, id: newTodoId }));
-    }, [newTodoId])
+        if (todoId) {
+            let updatedList = todoList.filter( (item, index) => {
+                return item.id == todoId
+            })
+            setNewTodo( updatedList[0])
+        } else {
+            setNewTodo((prevTodo) => ({ ...prevTodo, id: newTodoId }));
+            console.log('hellooo')
+        }
+    }, [newTodoId, todoId])
 
     const handleAddTodoItem = (e) => {
         const { name, value } = e.target;
         if (value) {
-            setNewTodo({ ...newTodo, [name]: value })
             setError('')
         }
+        setNewTodo({ ...newTodo, [name]: value })
     }
 
     const handleSubmit = (e) => {
@@ -51,9 +59,25 @@ const AddTodo = () => {
         }
     }
 
+    const handleEditTodo = (e) => {
+        e.preventDefault();
+        if (newTodo.title && newTodo.desc) {
+            let updatedList = todoList.map((item) => {
+                if (item.id == todoId) {
+                    return {...newTodo}
+                }
+                return item
+            })
+            localStorage.setItem("todolist", JSON.stringify(updatedList))
+            navigate('/')
+        } else {
+            setError('Title and Description Should not be Empty')
+        }
+    }
+
     return (
         <div className="formWrapper">
-            <h1 className='pageHeading'>Add a New Todo To the List.</h1>
+            {todoId ? <h1 className='pageHeading'>Edit Your Todo</h1> : <h1 className='pageHeading'>Add ToDo to your List.</h1> }
             <form>
                 <label>Title</label>
                 <input
@@ -63,17 +87,21 @@ const AddTodo = () => {
                     onChange={handleAddTodoItem}
                     placeholder='Enter Todo' />
                 <label>Description</label>
-                <input
-                    type='text'
+                <textarea
                     value={newTodo.desc}
                     name="desc"
                     onChange={handleAddTodoItem}
                     placeholder='Enter Description' />
 
                 <p>{error}</p>
+                { todoId ? 
+                <button onClick={handleEditTodo}>
+                    Edit
+                </button>  :
                 <button onClick={handleSubmit}>
                     Add
-                </button>
+                </button> 
+                }
             </form>
         </div>
     )
