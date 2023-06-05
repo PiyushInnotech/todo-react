@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { addTodo } from '../redux/todos/todoActions';
 
 const getLocalList = () => {
     let list = localStorage.getItem('todolist')
@@ -17,6 +19,8 @@ const AddTodo = () => {
         id: null,
         showDesc: false
     });
+    const dispatch = useDispatch()
+    const todos = useSelector((state) => state.todo.todoList)
     const navigate = useNavigate();
     const {todoId} = useParams();
     const [error, setError] = useState('');
@@ -31,7 +35,6 @@ const AddTodo = () => {
             setNewTodo( updatedList[0])
         } else {
             setNewTodo((prevTodo) => ({ ...prevTodo, id: newTodoId }));
-            console.log('hellooo')
         }
     }, [newTodoId, todoId])
 
@@ -49,6 +52,7 @@ const AddTodo = () => {
             if (todoList) {
                 setTodoList([...todoList, newTodo]);
                 localStorage.setItem("todolist", JSON.stringify([...todoList, newTodo]))
+                dispatch(addTodo(newTodo))
             } else {
                 localStorage.setItem('todolist', JSON.stringify([newTodo]))
             }

@@ -29,7 +29,7 @@ const Todo = () => {
         navigate(`/edittodo/${id}`)
     }
 
-    const AddNewTodo = () => {
+    const addNewTodo = () => {
         navigate('/addtodo')
     }
 
@@ -62,12 +62,12 @@ const Todo = () => {
                     }) : (
                         <div className="noTodo">
                             <h4 className='pageSubHeading'>No Todos, Add a todo</h4>
-                            <button className='' onClick={() => AddNewTodo()}>Add</button>
+                            <button className='' onClick={() => addNewTodo()}>Add</button>
                         </div>
                     )
                 }
             </div>
-            { todoList && todoList.length && <button className='addButton' onClick={() => AddNewTodo()}>Add</button> }
+            { todoList && todoList.length && <button className='addButton' onClick={() => addNewTodo()}>Add</button> }
         </div>
     )
 }
